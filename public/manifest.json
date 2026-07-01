@@ -1,0 +1,16 @@
+{
+  "name": "AgroFlet",
+  "short_name": "AgroFlet",
+  "description": "Plataforma Logística Agropecuaria",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f8fafc",
+  "theme_color": "#059669",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}

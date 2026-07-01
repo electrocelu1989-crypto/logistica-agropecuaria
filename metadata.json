@@ -1,0 +1,6 @@
+{
+  "name": "Logística Agropecuaria",
+  "description": "Plataforma digital de logística agropecuaria con onboarding KYC, asignación de viajes transaccional anti-duplicación, algoritmo de match por radio y motor de penalidades.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
