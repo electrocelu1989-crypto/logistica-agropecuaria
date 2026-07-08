@@ -3,7 +3,7 @@ import { motion } from "motion/react";
 import { UserCheck, Package, Truck, Check, HelpCircle } from "lucide-react";
 
 interface StatusStepperProps {
-  estado: "DISPONIBLE" | "ASIGNADO" | "EN_CARGA" | "EN_TRANSITO" | "ENTREGADO" | "CANCELADO";
+  estado: "DISPONIBLE" | "EN_NEGOCIACION" | "ASIGNADO" | "EN_CARGA" | "EN_TRANSITO" | "ENTREGADO" | "CANCELADO";
   theme?: "light" | "dark";
 }
 

@@ -46,9 +46,10 @@ export default function ProductorView({
   }
 
   // Forms state
-  const [tipoGrano, setTipoGrano] = useState<"SOJA" | "MAIZ" | "TRIGO" | "GIRASOL" | "SORGO">("SOJA");
-  const [toneladas, setToneladas] = useState<number>(30);
-  const [carroceria, setCarroceria] = useState<"TOLVA" | "BARANDA_VOLCABLE" | "BATEA" | "TODO_PUERTAS">("TOLVA");
+  const [categoriaCarga, setCategoriaCarga] = useState<"MUDANZA" | "GENERAL" | "PELIGROSA" | "GRANOS" | "REFRIGERADA">("MUDANZA");
+  const [peso_kg, setPesoKg] = useState<number>(1000);
+  const [volumen_m3, setVolumenM3] = useState<number>(0);
+  const [carroceria, setCarroceria] = useState<"TOLVA" | "BARANDA_VOLCABLE" | "BATEA" | "TODO_PUERTAS" | "FURGON" | "PLAYO">("FURGON")
   const [origenIdx, setOrigenIdx] = useState<number>(0);
   const [destinoIdx, setDestinoIdx] = useState<number>(0);
   const [fechaCarga, setFechaCarga] = useState<string>("2026-07-01T10:00");
@@ -56,8 +57,8 @@ export default function ProductorView({
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const comisionPendiente = viajes
-    .filter((v) => v.productor_id === activeProductor.id && v.pago_publicacion_estado !== "ABONADA")
-    .reduce((sum, viaje) => sum + viaje.tarifa_por_tonelada * viaje.toneladas * 0.03, 0);
+    .filter((v) => v.dador_carga_id === activeProductor.id && v.pago_publicacion_estado !== "ABONADA")
+    .reduce((sum, viaje) => sum + viaje.tarifa_ofrecida * 0.03, 0);
 
   const [isPublishedSuccess, setIsPublishedSuccess] = useState<boolean>(false);
   const [showOnboardingModal, setShowOnboardingModal] = useState<boolean>(false);
@@ -82,10 +83,10 @@ export default function ProductorView({
   const standardRatePerTon = 40;
   const simulatedTariff = Math.round(distance * standardRatePerTon);
   const finalTariffPerTon = customTariff ? Number(customTariff) : simulatedTariff;
-  const totalTripValue = finalTariffPerTon * toneladas;
+  const totalTripValue = finalTariffPerTon;
 
   // Trips of this producer
-  const activeProducerTrips = viajes.filter((v) => v.productor_id === activeProductor?.id);
+  const activeProducerTrips = viajes.filter((v) => v.dador_carga_id === activeProductor?.id);
 
   const handleCreateTrip = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -126,11 +127,12 @@ export default function ProductorView({
 
     setIsLoading(true);
     const payload = {
-      productor_id: activeProductor.id,
-      tipo_grano: tipoGrano,
-      toneladas,
+      dador_carga_id: activeProductor.id,
+      categoria_carga: categoriaCarga,
+      volumen_m3: volumen_m3,
+      peso_kg,
       tipo_carroceria_requerida: carroceria,
-      tarifa_por_tonelada: finalTariffPerTon,
+      tarifa_ofrecida: finalTariffPerTon,
       fecha_carga_pactada: new Date(fechaCarga).toISOString(),
       origen: {
         direccion: o.direccion,
@@ -258,15 +260,15 @@ export default function ProductorView({
             <form onSubmit={handleCreateTrip} className="space-y-4">
               {/* Tipo de grano */}
               <div>
-                <label className="block text-slate-500 text-xs font-bold mb-1.5">Tipo de Grano</label>
+                <label className="block text-slate-500 text-xs font-bold mb-1.5">Categoría de Carga</label>
                 <div className="grid grid-cols-5 gap-1 bg-slate-100 p-1 rounded-lg border border-slate-200">
-                  {(["SOJA", "MAIZ", "TRIGO", "GIRASOL", "SORGO"] as const).map((g) => (
+                  {(["MUDANZA", "GENERAL", "PELIGROSA", "GRANOS", "REFRIGERADA"] as const).map((g) => (
                     <button
                       key={g}
                       type="button"
-                      onClick={() => setTipoGrano(g)}
+                      onClick={() => setCategoriaCarga(g)}
                       className={`py-1 text-[10px] font-bold rounded transition-all ${
-                        tipoGrano === g ? "bg-[#10b981] text-white shadow-sm" : "text-slate-600 hover:text-slate-900"
+                        categoriaCarga === g ? "bg-[#10b981] text-white shadow-sm" : "text-slate-600 hover:text-slate-900"
                       }`}
                     >
                       {g}
@@ -278,13 +280,13 @@ export default function ProductorView({
               {/* Toneladas y Tipo Carroceria */}
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-slate-500 text-xs font-bold mb-1.5">Toneladas de Carga</label>
+                  <label className="block text-slate-500 text-xs font-bold mb-1.5">Peso (Kg)</label>
                   <input
                     type="number"
-                    value={toneladas}
+                    value={peso_kg}
                     min={1}
                     max={50}
-                    onChange={(e) => setToneladas(Number(e.target.value))}
+                    onChange={(e) => setPesoKg(Number(e.target.value))}
                     className="bg-white border border-slate-200 text-slate-850 text-xs rounded-lg px-3 py-2 w-full focus:outline-none focus:border-[#10b981] focus:ring-1 focus:ring-[#10b981] shadow-xs"
                   />
                 </div>
@@ -440,7 +442,7 @@ export default function ProductorView({
               <div className="space-y-3.5 max-h-[460px] overflow-y-auto pr-1">
                 {activeProducerTrips.map((v) => {
                   const assignedDriver = v.chofer_id ? usuarios.find((u) => u.id === v.chofer_id) : null;
-                  const totalLoadValue = v.toneladas * v.tarifa_por_tonelada;
+                  const totalLoadValue = v.tarifa_ofrecida;
                   const publicationFee = Number((totalLoadValue * 0.03).toFixed(2));
                   const hasReceipt = Boolean(v.comprobante_publicacion?.fileName);
                   const isPublicationPaid = v.pago_publicacion_estado === "ABONADA";
@@ -455,9 +457,9 @@ export default function ProductorView({
                       <div className="flex items-center justify-between gap-2 border-b border-slate-200/80 pb-2.5">
                         <div className="flex items-center gap-2">
                           <span className="bg-emerald-50 text-emerald-700 text-[10px] font-extrabold px-2.5 py-1 rounded-md border border-emerald-200">
-                            {v.tipo_grano}
+                            {v.categoria_carga}
                           </span>
-                          <span className="text-slate-800 text-xs font-extrabold">{v.toneladas} Tn</span>
+                          <span className="text-slate-800 text-xs font-extrabold">{v.peso_kg} Kg</span>
                         </div>
                         <div className="flex items-center gap-1.5">
                           <span className={`text-[10px] font-extrabold px-2.5 py-0.5 rounded-full border ${
@@ -484,7 +486,7 @@ export default function ProductorView({
                           Fecha y hora: <b className="text-slate-800">{formatDateTime(v.fecha_creacion)}</b>
                         </p>
                         <p className="text-slate-500 md:col-span-2">
-                          Descripcion y detalle: <b className="text-slate-800">{v.tipo_grano} - {v.toneladas} Tn - {v.tipo_carroceria_requerida.replaceAll("_", " ")}</b>
+                          Descripcion y detalle: <b className="text-slate-800">{v.categoria_carga} - {v.peso_kg} Kg - {(v.tipo_carroceria_requerida || "").replaceAll("_", " ")}</b>
                         </p>
                         <p className="text-slate-500">
                           Importe total: <b className="text-emerald-700 font-mono">{formatCurrency(totalLoadValue)}</b>

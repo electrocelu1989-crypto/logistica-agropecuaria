@@ -371,7 +371,7 @@ export default function CamioneroView({
               <span className="font-extrabold font-mono text-amber-700">
                 ${viajes
                   .filter((v) => v.chofer_id === activeChofer?.id && v.pago_comision_camionero_estado !== "ABONADA")
-                  .reduce((sum, v) => sum + v.toneladas * v.tarifa_por_tonelada * 0.03, 0)
+                  .reduce((sum, v) => sum + v.tarifa_ofrecida * 0.03, 0)
                   .toLocaleString("es-AR", { minimumFractionDigits: 2 })} ARS
               </span>
             </div>
@@ -679,7 +679,7 @@ export default function CamioneroView({
                             <div key={t.id} className="bg-slate-950 rounded-xl p-3 border border-slate-800 space-y-2">
                               <div className="flex items-center justify-between">
                                 <span className="bg-emerald-950 text-emerald-400 font-extrabold text-[9px] px-2 py-0.5 rounded border border-emerald-500/20">
-                                  {t.tipo_grano}
+                                  {t.categoria_carga}
                                 </span>
                                 <span className="text-slate-400 text-[9px] font-mono">
                                   {dist} km de distancia
@@ -701,7 +701,7 @@ export default function CamioneroView({
                                 <div>
                                   <span className="text-slate-500 text-[8px] block uppercase font-mono">Pago Flete</span>
                                   <span className="text-emerald-400 font-bold font-mono text-[11px]">
-                                    ${(t.toneladas * t.tarifa_por_tonelada).toLocaleString("es-AR")} ARS
+                                    ${(t.tarifa_ofrecida).toLocaleString("es-AR")} ARS
                                   </span>
                                 </div>
 
@@ -769,7 +769,7 @@ export default function CamioneroView({
                         <div className="bg-slate-950 p-3 rounded-xl border border-slate-800 space-y-2.5 text-xs">
                           <div className="flex justify-between border-b border-slate-900 pb-1.5">
                             <span className="text-slate-400 text-[9px]">Grano de Carga:</span>
-                            <span className="font-bold text-emerald-400">{activeTrip.tipo_grano} ({activeTrip.toneladas} Tn)</span>
+                            <span className="font-bold text-emerald-400">{activeTrip.categoria_carga} ({activeTrip.peso_kg} Tn)</span>
                           </div>
                           <div className="space-y-1.5">
                             <p className="text-[10px] text-slate-300 truncate">
@@ -781,7 +781,7 @@ export default function CamioneroView({
                           </div>
                           <div className="flex justify-between border-t border-slate-900 pt-1.5">
                             <span className="text-slate-400 text-[9px]">Tarifa Total:</span>
-                            <span className="font-bold font-mono text-white">${(activeTrip.toneladas * activeTrip.tarifa_por_tonelada).toLocaleString("es-AR")} ARS</span>
+                            <span className="font-bold font-mono text-white">${(activeTrip.tarifa_ofrecida).toLocaleString("es-AR")} ARS</span>
                           </div>
                         </div>
 
@@ -837,7 +837,7 @@ export default function CamioneroView({
                       <span className="text-xl font-bold block font-mono mt-1">
                         ${viajes
                           .filter((v) => v.chofer_id === activeChofer?.id && v.pago_comision_camionero_estado !== "ABONADA")
-                          .reduce((sum, v) => sum + v.toneladas * v.tarifa_por_tonelada * 0.03, 0)
+                          .reduce((sum, v) => sum + v.tarifa_ofrecida * 0.03, 0)
                           .toLocaleString("es-AR", { minimumFractionDigits: 2 })} ARS
                       </span>
                       <p className="text-[9px] text-emerald-100 mt-2 leading-relaxed">

@@ -238,8 +238,8 @@ export default function RealTimeMap({
           iconAnchor: [17, 17]
         });
 
-        const prod = usuarios.find(u => u.id === viaje.productor_id);
-        const label = `${prod?.razon_social || "Productor"} (${viaje.tipo_grano} ${viaje.toneladas} Tn)`;
+        const prod = usuarios.find(u => u.id === viaje.dador_carga_id);
+        const label = `${prod?.razon_social || "Productor"} (${viaje.categoria_carga} ${viaje.peso_kg} Tn)`;
 
         updateMarker(key, viaje.origen.lat, viaje.origen.lng, icon, label, {
           type: "flete_pedido",
@@ -384,7 +384,7 @@ export default function RealTimeMap({
           iconAnchor: [17, 17]
         });
 
-        const cargoInfo = `${trip.tipo_grano} (${trip.toneladas} Tn) - ${trip.estado}`;
+        const cargoInfo = `${trip.categoria_carga} (${trip.peso_kg} Tn) - ${trip.estado}`;
         const driverName = chofer?.razon_social || "Chofer Asignado";
 
         updateMarker(markerKey, currentCoord.lat, currentCoord.lng, truckIcon, `Camión en Tránsito: ${driverName} (${cargoInfo})`, {
@@ -421,7 +421,7 @@ export default function RealTimeMap({
 
     if (userRole === "PRODUCTOR") {
       // Find one of the active producer's trips or Pergamino defaults
-      const activeTrips = viajes.filter(v => v.productor_id === activeUserId);
+      const activeTrips = viajes.filter(v => v.dador_carga_id === activeUserId);
       if (activeTrips.length > 0 && activeTrips[0]?.origen) {
         map.setView([activeTrips[0]!.origen.lat, activeTrips[0]!.origen.lng], 9);
       } else {
@@ -589,7 +589,7 @@ export default function RealTimeMap({
                     <div className="border-t border-slate-100 pt-2.5 space-y-2 text-xs">
                       <div>
                         <p className="text-slate-400 text-[9px] font-bold uppercase">Cargamento Requerido</p>
-                        <p className="text-slate-800 font-semibold">{selectedEntity.viaje.tipo_grano} • {selectedEntity.viaje.toneladas} Toneladas</p>
+                        <p className="text-slate-800 font-semibold">{selectedEntity.viaje.categoria_carga} • {selectedEntity.viaje.peso_kg} Toneladas</p>
                       </div>
                       <div>
                         <p className="text-slate-400 text-[9px] font-bold uppercase">Ubicación de Carga (Origen)</p>
@@ -607,7 +607,7 @@ export default function RealTimeMap({
                       <div>
                         <p className="text-slate-400 text-[9px] font-bold uppercase">Tarifa Ofertada</p>
                         <p className="text-emerald-700 font-extrabold text-xs">
-                          ${selectedEntity.viaje.tarifa_por_tonelada.toLocaleString("es-AR")} ARS / Tonelada
+                          ${selectedEntity.viaje.tarifa_ofrecida.toLocaleString("es-AR")} ARS / Tonelada
                         </p>
                       </div>
                     </div>
@@ -630,7 +630,7 @@ export default function RealTimeMap({
                     <div className="border-t border-slate-100 pt-2.5 space-y-2 text-xs">
                       <div>
                         <p className="text-slate-400 text-[9px] font-bold uppercase">Viaje Asociado</p>
-                        <p className="text-slate-800 font-semibold">{selectedEntity.trip.tipo_grano} • {selectedEntity.trip.toneladas} Tn</p>
+                        <p className="text-slate-800 font-semibold">{selectedEntity.trip.categoria_carga} • {selectedEntity.trip.peso_kg} Kg</p>
                       </div>
                       <div>
                         <p className="text-slate-400 text-[9px] font-bold uppercase">Ruta Activa</p>

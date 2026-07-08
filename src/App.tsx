@@ -29,9 +29,9 @@ CREATE TABLE users (
 
 CREATE TABLE trips (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  productor_id UUID REFERENCES users(id),
-  tipo_grano TEXT NOT NULL,
-  toneladas NUMERIC(10,2) NOT NULL,
+  dador_carga_id UUID REFERENCES users(id),
+  categoria_carga TEXT NOT NULL,
+  peso_kg NUMERIC(10,2) NOT NULL,
   origen TEXT NOT NULL,
   destino TEXT NOT NULL,
   fecha_carga TEXT,
@@ -51,9 +51,9 @@ type User struct {
 
 type Trip struct {
   ID          string  \`json:"id"\`
-  ProductorID string  \`json:"productor_id"\`
-  TipoGrano   string  \`json:"tipo_grano"\`
-  Toneladas   float64 \`json:"toneladas"\`
+  ProductorID string  \`json:"dador_carga_id"\`
+  TipoGrano   string  \`json:"categoria_carga"\`
+  Toneladas   float64 \`json:"peso_kg"\`
 }`;
 
 export default function App() {
@@ -244,12 +244,13 @@ export default function App() {
     }
   };
 
-  const handleUploadCamioneroReceipt = async (tripId: string, payload: { fileName: string; mimeType: string; dataUrl: string }) => {
+  const handleUploadCamioneroReceipt = async (tripId: string, file: any) => {
     try {
+      const formData = new FormData();
+      formData.append("file", file);
       const res = await authFetch(`/api/viajes/${tripId}/comprobante-camionero`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload)
+        body: formData
       });
       const data = await res.json();
       if (!res.ok) {
@@ -263,12 +264,13 @@ export default function App() {
     }
   };
 
-  const handleUploadPublicationReceipt = async (tripId: string, payload: { fileName: string; mimeType: string; dataUrl: string }) => {
+  const handleUploadPublicationReceipt = async (tripId: string, file: any) => {
     try {
+      const formData = new FormData();
+      formData.append("file", file);
       const res = await authFetch(`/api/viajes/${tripId}/comprobante`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload)
+        body: formData
       });
       const data = await res.json();
       if (!res.ok) {

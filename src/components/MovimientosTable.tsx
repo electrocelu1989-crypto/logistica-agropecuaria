@@ -51,11 +51,11 @@ export default function MovimientosTable({
   const producerPublishedLoads = useMemo(() => {
     if (userRole !== "PRODUCTOR") return [];
     return viajes
-      .filter((v) => v.productor_id === activeUserId)
+      .filter((v) => v.dador_carga_id === activeUserId)
       .filter((v) => {
         const term = searchTerm.toLowerCase();
-        const total = v.toneladas * v.tarifa_por_tonelada;
-        const description = `${v.id} ${v.numero_transaccion || ""} ${v.tipo_grano} ${v.toneladas} ${v.tipo_carroceria_requerida} ${v.origen.direccion} ${v.destino.direccion} ${total}`;
+        const total = v.tarifa_ofrecida;
+        const description = `${v.id} ${v.numero_transaccion || ""} ${v.categoria_carga} ${v.peso_kg} ${v.tipo_carroceria_requerida} ${v.origen.direccion} ${v.destino.direccion} ${total}`;
         const matchesSearch = description.toLowerCase().includes(term);
         const matchesStatus =
           filterSubtype === "ALL" ||
@@ -72,9 +72,9 @@ export default function MovimientosTable({
       .filter((v) => v.chofer_id === activeUserId)
       .filter((v) => {
         const term = searchTerm.toLowerCase();
-        const total = v.toneladas * v.tarifa_por_tonelada;
-        const productor = usuarios.find((u) => u.id === v.productor_id);
-        const description = `${v.id} ${v.numero_transaccion || ""} ${v.tipo_grano} ${productor?.razon_social || ""} ${total}`;
+        const total = v.tarifa_ofrecida;
+        const productor = usuarios.find((u) => u.id === v.dador_carga_id);
+        const description = `${v.id} ${v.numero_transaccion || ""} ${v.categoria_carga} ${productor?.razon_social || ""} ${total}`;
         const matchesSearch = description.toLowerCase().includes(term);
         const matchesStatus =
           filterSubtype === "ALL" ||
@@ -171,7 +171,7 @@ export default function MovimientosTable({
             </div>
           ) : (
             paginatedItems.map((v) => {
-              const total = v.toneladas * v.tarifa_por_tonelada;
+              const total = v.tarifa_ofrecida;
               const fee = Number((total * 0.03).toFixed(2));
               const isPaid =
                 userRole === "PRODUCTOR"
@@ -185,7 +185,7 @@ export default function MovimientosTable({
                 <div key={v.id} className="bg-slate-950 p-2.5 rounded-lg border border-slate-900 text-[10px] gap-2">
                   <div className="flex justify-between items-start">
                     <div>
-                      <p className="text-slate-300 font-bold">{v.tipo_grano} · {v.toneladas} Tn</p>
+                      <p className="text-slate-300 font-bold">{v.categoria_carga} · {v.peso_kg} Kg</p>
                       <p className="text-slate-500 font-mono text-[9px]">{formatCurrency(total)} · Comisión {formatCurrency(fee)}</p>
                       <p className="text-slate-500 text-[8px]">Vence: {formatDueDate(dueDate)}</p>
                     </div>
@@ -227,7 +227,7 @@ export default function MovimientosTable({
         ? v.pago_publicacion_estado !== "ABONADA"
         : v.pago_comision_camionero_estado !== "ABONADA"
     )
-    .reduce((sum, v) => sum + v.toneladas * v.tarifa_por_tonelada * 0.03, 0);
+    .reduce((sum, v) => sum + v.tarifa_ofrecida * 0.03, 0);
   const paidCount = activeList.filter((v) =>
     userRole === "PRODUCTOR"
       ? v.pago_publicacion_estado === "ABONADA"
@@ -322,7 +322,7 @@ export default function MovimientosTable({
                   </tr>
                 ) : (
                   paginatedItems.map((v) => {
-                    const total = v.toneladas * v.tarifa_por_tonelada;
+                    const total = v.tarifa_ofrecida;
                     const fee = Number((total * 0.03).toFixed(2));
                     const isPaid =
                       userRole === "PRODUCTOR"
@@ -336,7 +336,7 @@ export default function MovimientosTable({
                       userRole === "PRODUCTOR"
                         ? Boolean(v.comprobante_publicacion?.fileName)
                         : Boolean(v.comprobante_comision_camionero?.fileName);
-                    const productor = usuarios.find((u) => u.id === v.productor_id);
+                    const productor = usuarios.find((u) => u.id === v.dador_carga_id);
                     const uploadMode = userRole === "PRODUCTOR" ? "PRODUCTOR" : "CAMIONERO";
                     const uploadFn =
                       userRole === "PRODUCTOR" ? onUploadPublicationReceipt : onUploadCamioneroReceipt;
@@ -351,11 +351,11 @@ export default function MovimientosTable({
                           </span>
                         </td>
                         <td className="py-4 px-4 text-slate-600 min-w-[220px] align-top">
-                          <p className="font-semibold text-slate-800">{v.tipo_grano} - {v.toneladas} Tn</p>
+                          <p className="font-semibold text-slate-800">{v.categoria_carga} - {v.peso_kg} Kg</p>
                           <p className="text-[11px] text-slate-500 mt-0.5">
                             {userRole === "PRODUCTOR"
                               ? `${v.origen.direccion} → ${v.destino.direccion}`
-                              : `Productor: ${productor?.razon_social || v.productor_id}`}
+                              : `Productor: ${productor?.razon_social || v.dador_carga_id}`}
                           </p>
                         </td>
                         <td className="py-4 px-4 text-right font-mono text-slate-800 font-bold whitespace-nowrap align-top">{formatCurrency(total)}</td>
@@ -406,7 +406,7 @@ export default function MovimientosTable({
         </div>
 
         {paginatedItems.map((v) => {
-          const total = v.toneladas * v.tarifa_por_tonelada;
+          const total = v.tarifa_ofrecida;
           const fee = Number((total * 0.03).toFixed(2));
           const isPaid =
             userRole === "PRODUCTOR"

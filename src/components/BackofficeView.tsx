@@ -228,8 +228,8 @@ export default function BackofficeView({
                 </thead>
                 <tbody className="divide-y divide-slate-100">
                   {publicationTrips.map((v) => {
-                    const productor = usuarios.find((u) => u.id === v.productor_id);
-                    const total = v.toneladas * v.tarifa_por_tonelada;
+                    const productor = usuarios.find((u) => u.id === v.dador_carga_id);
+                    const total = v.tarifa_ofrecida;
                     const fee = Number((total * 0.03).toFixed(2));
                     const isPaid = v.pago_publicacion_estado === "ABONADA";
                     return (
@@ -239,9 +239,9 @@ export default function BackofficeView({
                           <p className="font-mono text-[10px] text-slate-500">{v.numero_transaccion || "Sin TX"}</p>
                           <p className="text-[10px] text-slate-400">{formatDateTime(v.fecha_creacion)}</p>
                         </td>
-                        <td className="px-4 py-3 align-top text-slate-700 font-bold">{productor?.razon_social || v.productor_id}</td>
+                        <td className="px-4 py-3 align-top text-slate-700 font-bold">{productor?.razon_social || v.dador_carga_id}</td>
                         <td className="px-4 py-3 align-top text-slate-600">
-                          <p>{v.tipo_grano} - {v.toneladas} Tn - {v.tipo_carroceria_requerida.replaceAll("_", " ")}</p>
+                          <p>{v.categoria_carga} - {v.peso_kg} Kg - {(v.tipo_carroceria_requerida || "").replaceAll("_", " ")}</p>
                           <p className="text-[10px] text-slate-400">{v.origen.direccion} / {v.destino.direccion}</p>
                         </td>
                         <td className="px-4 py-3 align-top text-right font-mono text-slate-700">{formatCurrency(total)}</td>
@@ -323,7 +323,7 @@ export default function BackofficeView({
                 <tbody className="divide-y divide-slate-100">
                   {camioneroCommissionTrips.map((v) => {
                     const chofer = usuarios.find((u) => u.id === v.chofer_id);
-                    const total = v.toneladas * v.tarifa_por_tonelada;
+                    const total = v.tarifa_ofrecida;
                     const fee = Number((total * 0.03).toFixed(2));
                     const isPaid = v.pago_comision_camionero_estado === "ABONADA";
                     return (
